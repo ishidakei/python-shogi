@@ -494,7 +494,7 @@ class TCPProtocol:
         # TODO: check REJECT:<GameID> by <rejector>
         self.command('REJECT')
 
-    def move(self, piece_type, color, move):
+    def move(self, piece_type, color, move, comment = None):
         if move.from_square is None:
             from_square = '00'
         else:
@@ -503,6 +503,8 @@ class TCPProtocol:
                 from_square,
                 SQUARE_NAMES[move.to_square],
                 PIECE_SYMBOLS[piece_type])
+        if comment is not None:
+            comment += ',{0}'.format(comment)
         line = self.command(command)
 
     def resign(self):
