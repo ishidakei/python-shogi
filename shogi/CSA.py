@@ -475,6 +475,7 @@ class TCPProtocol:
             'names': names,
             'sfen': sfen,
             'moves': [],
+            'time': time_summary,
         }
 
         return {
