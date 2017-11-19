@@ -156,11 +156,11 @@ class CSAUSIBrdige:
                                 btime = max(0, btime - int(spend_time * 1000))
                             else:
                                 wtime = max(0, wtime - int(spend_time * 1000))
-                            self.show_and_log("SELF MOVE: {0}{1},T{2},{3}".format(shogi.COLORS[turn],
-                                                                                next_move,
-                                                                                spend_time,
-                                                                                comment,
-                                                                                ),
+                            self.show_and_log("SELF MOVE: {0}{1},T{2},{3}".format("+" if turn == 0 else "-",
+                                                                                  next_move,
+                                                                                  spend_time,
+                                                                                  comment,
+                                                                                  ),
                                               log)
                             break
                         self.show_and_log("MESSAGE: {0}".format(line),
@@ -192,10 +192,10 @@ class CSAUSIBrdige:
                     else:
                         wtime = max(0, wtime - int(spend_time * 1000))
                     move = shogi.Move.from_usi(usi)
-                    self.show_and_log("OPPONENT MOVE: {0}{1},T{2}".format(shogi.COLORS[turn],
-                                                                move,
-                                                                spend_time,
-                                                                ),
+                    self.show_and_log("OPPONENT MOVE: {0}{1},T{2}".format("+" if turn == 0 else "-",
+                                                                          move,
+                                                                          spend_time,
+                                                                          ),
                                       log)
                     if ponder != None:
                         if ponder != usi:
