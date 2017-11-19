@@ -260,3 +260,79 @@ ToDo
 - Support %MATTA etc. in CSA TCP Protocol.
 
 - Support board.is_pinned() and board.pin().
+
+本リポジトリについて
+=====================
+
+- 本リポジトリは、python-shogi https://github.com/gunyarakun/python-shogi をforkしました。
+
+- python-shogi ライブラリをを一部変更しています。
+
+- USIエンジンからCSAプロトコルで通信するためのスクリプト scripts/csa_usi_bridge.py が含まれています。
+
+- 第5回電王トーナメント http://denou.jp/tournament2017/ (以下、std5)に出場した Yorkie は、scripts/csa_usi_bridge.py を使い、Linux PC上で X server を止めた状態で対局しました。
+
+CSA USI bridgeでできること
+-----------------------
+
+- USIエンジンを使ったCSAプロトコルでの対局
+
+- USIエンジン起動時に、テキストファイルの内容に基づいたsetoptionをUSIエンジンに送る。
+
+- CUIでの局面表示::
+
+    l  n  s  g  k  g  s  n  l
+    .  r  .  .  .  .  .  b  .
+    p  p  p  p  p  p  p  p  p
+    .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .
+    .  .  .  .  .  .  .  .  .
+    P  P  P  P  P  P  P  P  P
+    .  B  .  .  .  .  .  R  .
+    L  N  S  G  K  G  S  N  L
+    B(self): 300.0 W: 300.0
+    USI>  position lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1
+    USI>  go btime 310000 wtime 300000 byoyomi 0
+    USI<  info pv 7g7f 3c3d (100.00%) score cp 0 depth 0 multipv 1
+    USI<  bestmove 7g7f ponder 3c3d
+    USI>  position lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1 moves 7g7f 3c3d
+    USI>  go ponder
+
+- 残り時間の表示
+
+- CSAサーバーに対して、評価値や読み筋や評価局面数の送信(std5形式)
+
+- 双方の指し手と消費時間の記録
+
+- 途中の局面からの対局
+
+CSA USI bridgeでできないこと、できないかもしれないこと
+--------------------------------------------
+
+- ponder思考時のパイプ処理を手抜きしているので、ponderでの思考時、OSのパイプのバッファにテキストがたまりまくる。したがって、ponder思考時にUSIエンジンからのテキスト出力が大量になると、とりこぼすかも。Linuxのデフォルト設定で、YaneuraOuくらいのテキスト出力量だと、1回のponder思考時間が３〜6時間くらいまでは大丈夫だと思うが、テキスト出力が多めのUSIエンジンだったり、パイプのバッファが小さめのOSだときついかも。
+
+- USIエンジンが出力する文字コードをUTF-8と決め打ちしているので、他の文字コードだと文字化けしたり、落ちたりするかも。
+
+- python-shogi ライブラリへの変更点は、Python2系列と3系列でテストしてるけど、scripts/csa_usi_bridge.py は Python3系列でしか試してないので、2系列だとダメかも。
+
+- 対局が終わるとスクリプトが終了するので、連続対局できない。
+
+- CSA拡張モードに対応していない。
+
+- 自分の手を送る時のコメントの仕様について、std5ルールだけに合わせている。
+
+- USIエンジンがどの深さまで読んでいても、読み筋として1手しか送っていない。
+
+std5版との違い
+---------------------
+
+- std5では、使用可能な python-shogi ライブラリとしてVer1.0.4が指定されていたので、Ver1.0.4を元にしてIssueの#7, #8, #9を自前で修正し、その状態の python-shogi ライブラリを前提に scripts/csa_usi_bridge.py を作成しました。一方で本リポジトリでは、Issue #7, #8, #9をすべて修正済みのVer1.0.6からforkし、その状態の python-shogi ライブラリを前提にした scripts/csa_usi_bridge.py としました。
+
+- std5の scripts/csa_usi_bridge.py は、USIエンジンを Yorkie に決め打ちしていた一方、本リポジトリでは引数でUSIエンジンを指定できるようにしています。
+
+- std5の scripts/csa_usi_bridge.py で局面表示時、駒を漢字で表示していた一方、本リポジトリでは駒を英字で表示しています。
+
+その他
+------
+
+- 本リポジトリでpython-shogi ライブラリに対して変更した箇所のうち、割と汎用的に使えそうな部分は、fork元に pull request しているので、とりこんでもらえるかも。
