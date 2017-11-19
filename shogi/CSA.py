@@ -430,6 +430,7 @@ class TCPProtocol:
         position_lines = None
         names = [None, None]
         position = None
+        move_lines = []
         for line in game_summary_block.split('\n'):
             if line == 'BEGIN Game_Summary' or line == 'END Game_Summary':
                 pass
@@ -446,7 +447,10 @@ class TCPProtocol:
             elif time_lines is not None:
                 time_lines.append(line)
             elif position_lines is not None:
-                position_lines.append(line)
+                if line[0] in COLOR_SYMBOLS and len(line) > 1:
+                    move_lines.append(line)
+                else:
+                    position_lines.append(line)
             elif ':' in line:
                 (key, value) = line.split(':', 1)
                 if key == 'Name+':
@@ -471,10 +475,20 @@ class TCPProtocol:
             to_move_color_str,
             1)
 
+        moves = []
+        if len(move_lines) > 0:
+            board = shogi.Board(sfen)
+            for line in move_lines:
+                (turn, usi, spend_time, message) = self.parse_server_message(line, board)
+                board.push_usi(usi)
+                moves.append({'color': turn,
+                              'usi': usi,
+                              'spend_time': spend_time})
+
         summary = {
             'names': names,
             'sfen': sfen,
-            'moves': [],
+            'moves': moves,
             'time': time_summary,
         }
 

@@ -73,7 +73,7 @@ class ParserTest(unittest.TestCase):
 TEST_SUMMARY = {
     'names': ['kiki_no_onaka_black', 'kiki_no_omata_white'],
     'sfen': 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1',
-    'moves': [],
+    'moves': [{'color': 0, 'spend_time': 12.0, 'usi': '2g2f'}, {'color': 1, 'spend_time': 6.0, 'usi': '3c3d'}],
     'time': {'Time_Unit': '1sec', 'Total_Time': '900', 'Byoyomi': '0', 'Least_Time_Per_Move': '1'}
 }
 
@@ -106,6 +106,8 @@ P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
 P8 * +KA *  *  *  *  * +HI * 
 P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
 +
++2726FU,T12
+-3334FU,T6
 END Position
 END Game_Summary
 '''
@@ -154,6 +156,8 @@ class TCPProtocolTest(unittest.TestCase):
         game_summary = tcp.wait_match()
 
         board = shogi.Board(game_summary['summary']['sfen'])
+        for move in game_summary['summary']['moves']:
+            board.push(shogi.Move.from_usi(move['usi']))
         self.add_response(tcp, 'START:20150505-CSA25-3-5-7\n')
         tcp.agree()
 
@@ -163,8 +167,7 @@ class TCPProtocolTest(unittest.TestCase):
         self.assertEqual(turn, shogi.BLACK)
         self.assertEqual(spend_time, 1.0)
 
-        self.assertEqual(board.sfen(), 'lnsgkgsnl/1r5b1/ppppppppp/9/9/4P4/PPPP1PPPP/1B5R1/LNSGKGSNL w - 2')
-        
+        self.assertEqual(board.sfen(), 'lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/4P2P1/PPPP1PP1P/1B5R1/LNSGKGSNL w - 4')
         next_move = shogi.Move.from_usi('8c8d')
         board.push(next_move)
         self.add_response(tcp, '-8384FU,T2\n')
